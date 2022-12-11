@@ -12,19 +12,13 @@ clean:
 	rm -rf _site _build
 
 build:
-	./bin/build-pandoc.sh default
-
-build-dark:
-	./bin/build-pandoc.sh water
-
-build-style:
 	./bin/build-pandoc.sh $(STYLE)
 
 publish:
-	IPFS_API=$(IPFS_API) ./bin/add-ipfs.sh -k website-1 -f _site/index.html
+	IPFS_API=$(IPFS_API) ./bin/add-ipfs.sh -k $(IPFS_KEY) -f _site/index.html
 
 key:
-	ipfs --api=$(IPFS_API) key gen website-1
+	ipfs --api=$(IPFS_API) key gen $(IPFS_KEY)
 
 open:
 	open _site/index.html
