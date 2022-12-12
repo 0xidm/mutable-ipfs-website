@@ -113,14 +113,16 @@ Clone this repo into a new directory, then initialize a new git repo inside it.
 git clone https://github.com/0xidm/mutable-ipfs-website new-website
 cd new-website
 rm -rf .git
-git init
+git init --initial-branch=main
+git add .
+git commit -m "Initial commit"
 ```
 
 Create a new git repo online (e.g. on github) and update your git remote to reference the new repo.
 
 ```{bash}
 git remote add origin git@github.com:0xidm/new-website
-git push origin
+git push -u origin main
 ```
 
 ## Pandoc
