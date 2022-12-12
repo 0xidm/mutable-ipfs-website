@@ -142,9 +142,10 @@ Discover vanity IPNS hashes with brute-force:
 ```{bash}
 go install github.com/0xidm/peer-id-generator
 peer-id-generator yourvanitystring
+ipfs key import vanity-1 $HASH
 ```
 
-Now you have a key that produces a `/ipns/$HASH` that you like.
+Now you have a key called vanity-1 that produces a `/ipns/$HASH` that you like.
 
 ### 0xidm fork
 
