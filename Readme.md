@@ -105,6 +105,24 @@ Specify URL in markdown as `[a link to the text file](hello.txt)`
 
 The file can be updated by re-running `add-ipfs.sh` and the URL will remain stable, even though the file content has changed.
 
+## Creating a new website
+
+Clone this repo into a new directory, then initialize a new git repo inside it.
+
+```{bash}
+git clone https://github.com/0xidm/mutable-ipfs-website new-website
+cd new-website
+rm -rf .git
+git init
+```
+
+Create a new git repo online (e.g. on github) and update your git remote to reference the new repo.
+
+```{bash}
+git remote add origin git@github.com:0xidm/new-website
+git push origin
+```
+
 ## Pandoc
 
 Pandoc is used to render `index.md` into `index.html`.
