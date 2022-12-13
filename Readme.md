@@ -1,6 +1,11 @@
 # Mutable Website on IPFS
 
-Create a mutable IPFS website with a stable IPNS address.
+Publish a website to IPFS that can be updated without breaking all the URLs.
+In more technical terms: create a mutable IPFS website with a stable IPNS hash.
+Using this method, a website built with relative URLs will function the same on IPFS as on the classic web.
+
+- https://github.com/0xidm/mutable-ipfs-website
+- https://ipfs.io/ipns/12D3KooWF3i8N37HMLfAzqBkcnuG9LQta5DNt58VqZYNJhRoXiDM
 
 ## Quick Start
 
@@ -22,7 +27,25 @@ make build publish
 
 Even though the content has changed, the URL remains stable.
 
-## Installation
+## How this Works
+
+One unique feature of [IPFS](https://ipfs.io/ipns/docs.ipfs.tech/) is that it is [immutable](https://ipfs.io/ipns/docs.ipfs.tech/concepts/immutability/).
+When content is changed on IPFS, this produces a new URL to reference the new content.
+For content like a website, it's desirable to have a URL that stays the same - and the trouble with IPFS occurs when the website needs to be updated.
+
+[IPNS](https://ipfs.io/ipns/docs.ipfs.tech/concepts/ipns/) provides a Name System that can solve the problem of ever-changing IPFS URLs.
+When IPFS content is updated, IPNS can be updated to point to the new content.
+This IPNS hash never changes; it is stable over time.
+On its own, IPNS is a complete solution for single-page websites.
+
+What if you needed to publish many files at once, like a regular website?
+[MFS](https://ipfs.io/ipns/docs.ipfs.tech/concepts/file-systems/#mutable-file-system-mfs) is a Mutable File System that provides a familiar path, subdirectory, and file metaphor on top of IPFS.
+With MFS, it's possible to publish and update a whole hierarchy of files and folders, just like a regular website.
+MFS provides a natural bridge between HTTP, HTML, and IPFS so that URLs can contain a file path - like normal.
+
+This method for publishing via IPFS+IPNS+MFS+HTTP enables a classic website built for IPv4+HTTP (with relative URLs) to be published without modification on IPFS.
+
+## Requirements
 
 Rendering markdown to html requires pandoc. Try the following to install:
 
@@ -30,19 +53,29 @@ Rendering markdown to html requires pandoc. Try the following to install:
 - ubuntu/debian: `apt install pandoc`
 - redhat: `rpm install pandoc`
 
-## Configuration
+## Usage
+
+### Create a new website
+
+Clone into the `new-website` path and remove the existing git repo.
+
+```{bash}
+git clone https://github.com/0xidm/mutable-ipfs-website new-website
+cd new-website
+rm -rf .git
+```
+
+### Configuration
 
 Copy `settings.example.mk` to `settings.mk`.
 
 The following variables can be changed:
 
-- IPFS_API: the IP v4 address and TCP port of your IPFS node. Default is `/ip4/127.0.0.1/tcp/5001`
-- IPFS_KEY: name of IPFS key; also used as MFS path. Default is `website-1`
-- STYLE: a pandoc style used when `index.md` is rendered to `index.html`
+- `IPFS_API`: the IP v4 address and TCP port of your IPFS node. Default is `/ip4/127.0.0.1/tcp/5001`
+- `IPFS_KEY`: name of IPFS key; also used as MFS path. Default is `website-1`
+- `STYLE`: a pandoc style used when `index.md` is rendered to `index.html`
 
-## Usage
-
-### Generate IPFS key for unique IPNS hash
+### Generate key for stable IPNS hash
 
 Edit `settings.mk` to specify a key name, then generate that key:
 
@@ -105,26 +138,6 @@ Specify URL in markdown as `[a link to the text file](hello.txt)`
 
 The file can be updated by re-running `add-ipfs.sh` and the URL will remain stable, even though the file content has changed.
 
-## Creating a new website
-
-Clone this repo into a new directory, then initialize a new git repo inside it.
-
-```{bash}
-git clone https://github.com/0xidm/mutable-ipfs-website new-website
-cd new-website
-rm -rf .git
-git init --initial-branch=main
-git add .
-git commit -m "Initial commit"
-```
-
-Create a new git repo online (e.g. on github) and update your git remote to reference the new repo.
-
-```{bash}
-git remote add origin git@github.com:0xidm/new-website
-git push -u origin main
-```
-
 ## Pandoc
 
 Pandoc is used to render `index.md` into `index.html`.
@@ -165,9 +178,32 @@ peer-id-generator yourvanitystring
 ipfs key import vanity-1 $HASH
 ```
 
-Now you have a key called vanity-1 that produces a `/ipns/$HASH` that you like.
+Now you have a key called `vanity-1` that produces a `/ipns/$HASH` that you like.
+
+To view your IPNS hash again:
+
+```{bash}
+ipfs key list -l --ipns-base b58mh
+```
 
 ### 0xidm fork
 
-The 0xidm fork modifies the original code by [meehow](github.com/meehow/peer-id-generator) to reserve 1 CPU for system usability.
+The 0xidm fork modifies the original code by [meehow](https://github.com/meehow/peer-id-generator) to reserve 1 CPU for system usability.
 If you want to brute-force even faster, or if you have only 1 CPU, install their code: `go install github.com/meehow/peer-id-generator`.
+
+## Version control for website
+
+Create a new local git repo for the site.
+
+```{bash}
+git init --initial-branch=main
+git add .
+git commit -m "Initial commit"
+```
+
+Create a remote git repo (e.g. on github) and update your git remote to reference the new repo.
+
+```{bash}
+git remote add origin git@github.com:0xidm/new-website
+git push -u origin main
+```
