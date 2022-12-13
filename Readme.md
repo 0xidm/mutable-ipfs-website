@@ -10,8 +10,8 @@ Using this method, a website built with relative URLs will function the same on 
 ## Quick Start
 
 ```{bash}
-git clone https://github.com/0xidm/mutable-ipfs-website
-cd mutable-ipfs-website
+git clone https://github.com/0xidm/mutable-ipfs-website new-website
+cd new-website
 cp settings.example.mk settings.mk
 # if your IPFS node is not localhost, edit settings.mk to change IPFS_API
 make key build publish
