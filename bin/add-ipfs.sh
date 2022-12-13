@@ -63,11 +63,18 @@ function get_key_hash() {
   echo -n $(ipfs --api="$IPFS_API" key list -l | grep "$IPFS_KEY" | awk '{print $1}')
 }
 
+function get_key_hash_base58() {
+  local IPFS_API; IPFS_API=$1
+  local IPFS_KEY; IPFS_KEY=$2
+
+  echo -n $(ipfs --api="$IPFS_API" key list -l --ipns-base b58mh | grep "$IPFS_KEY" | awk '{print $1}')
+}
+
 function get_ipns_path() {
   local IPFS_API; IPFS_API=$1
   local IPFS_KEY; IPFS_KEY=$2
 
-  echo -n /ipns/$(get_key_hash "$IPFS_API" "$IPFS_KEY")
+  echo -n /ipns/$(get_key_hash_base58 "$IPFS_API" "$IPFS_KEY")
 }
 
 function get_mfs_path_cid() {
