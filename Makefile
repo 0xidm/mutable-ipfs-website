@@ -22,3 +22,7 @@ key:
 
 open:
 	open _site/index.html
+
+build-readme:
+	./bin/build-pandoc.sh default Readme.md
+	IPFS_API=$(IPFS_API) ./bin/add-ipfs.sh -k oxidm-1 -f _site/index.html

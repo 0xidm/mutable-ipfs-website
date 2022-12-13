@@ -8,9 +8,16 @@ fi
 
 mkdir -p _site _build
 
-echo "copy template.html and index.md"
+if [ -z $2 ]; then
+  FILENAME=index.md
+else
+  FILENAME=$2
+fi
+
+echo "copy template.html, ${STYLE}.css, and ${FILENAME}"
 cp styles/template.html _build
-cp index.md _build
+cp "${FILENAME}" _build/index.md
+cp "styles/${STYLE}.css" _build/styles.html
 
 echo "render index.html"
 pushd _build || exit 1
