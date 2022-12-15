@@ -22,7 +22,8 @@ cp "styles/${STYLE}.css" _build/styles.html
 echo "render index.html"
 pushd _build || exit 1
 pandoc \
-    -f markdown -t html \
+    -f markdown+backtick_code_blocks+fenced_code_attributes \
+    -t html \
     --self-contained \
     --template template.html \
     -o index.raw.html \

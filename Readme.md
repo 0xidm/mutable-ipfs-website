@@ -9,7 +9,7 @@ Using this method, a website built with relative URLs will function the same on 
 
 ## Quick Start
 
-```{bash}
+```bash
 git clone https://github.com/0xidm/mutable-ipfs-website new-website
 cd new-website
 cp settings.example.mk settings.mk
@@ -21,7 +21,7 @@ You now have a website with a URL like https://ipfs.io/ipns/$HASH
 
 Make some changes to `index.md`, then update the website:
 
-```{bash}
+```bash
 make build publish
 ```
 
@@ -59,7 +59,7 @@ Rendering markdown to html requires pandoc. Try the following to install:
 
 Clone into the `new-website` path and remove the existing git repo.
 
-```{bash}
+```bash
 git clone https://github.com/0xidm/mutable-ipfs-website new-website
 cd new-website
 rm -rf .git
@@ -79,13 +79,13 @@ The following variables can be changed:
 
 Edit `settings.mk` to specify a key name, then generate that key:
 
-```{bash}
+```bash
 make key
 ```
 
 which expands into:
 
-```{bash}
+```bash
 ipfs --api=/ip4/127.0.0.1/tcp/5001 key gen website-1
 ```
 
@@ -95,7 +95,7 @@ It's easier to just `make key`.
 
 Modify `index.md`, then render/deploy using the `Makefile`
 
-```{bash}
+```bash
 make all
 ```
 
@@ -107,13 +107,13 @@ https://ipfs.io/ipns/$HASH
 
 `make all` is equivalent to:
 
-```{bash}
+```bash
 make build publish
 ```
 
 which expands into the following:
 
-```{bash}
+```bash
 ./bin/build-pandoc.sh default
 ./bin/add-ipfs.sh -k website-1 -f _site/index.html
 ```
@@ -124,7 +124,7 @@ These commands can be invoked manually.
 
 Add any file to IPFS, then publish to the IPNS hash from the `website-1` key.
 
-```{bash}
+```bash
 echo "Hello IPFS" > hello.txt
 ./bin/add-ipfs.sh -k website-1 -f hello.txt
 ```
@@ -145,7 +145,7 @@ In the `hello.txt` example, specify URL in markdown as `[a link to the text file
 A file can be placed in an MFS subdirectory.
 In the following example, `hello.txt` is placed into the `documents` subdirectory:
 
-```{bash}
+```bash
 echo "Hello IPFS" > hello.txt
 ./bin/add-ipfs.sh -k website-1 -d documents -f hello.txt
 ```
@@ -170,13 +170,13 @@ When the IPFS Web UI changes files - or *any* process other than `add-ipfs.sh` -
 
 The following will refresh IPNS for the configured key:
 
-```{bash}
+```bash
 make refresh-ipns
 ```
 
 which expands into:
 
-```{bash}
+```bash
 IPFS_API=$(IPFS_API) ./bin/add-ipfs.sh -k $(IPFS_KEY)
 ```
 
@@ -190,7 +190,7 @@ Pandoc is used to render `index.md` into `index.html`.
 
 Create a template, then modify as you like:
 
-```{bash}
+```bash
 pandoc -D html > styles/template.html
 ```
 
@@ -206,7 +206,7 @@ Install new pandoc CSS styles by placing them into `./styles`.
 
 The `default` style can be replaced with a dark theme called [water](https://github.com/kognise/water.css), by [Kognise](https://kognise.dev).
 
-```{bash}
+```bash
 ./bin/build-pandoc.sh water
 ```
 
@@ -216,7 +216,7 @@ To make this style permanent, set `STYLE=water` in `settings.mk`.
 
 Discover vanity IPNS hashes with brute-force:
 
-```{bash}
+```bash
 go install github.com/0xidm/peer-id-generator
 peer-id-generator yourvanitystring
 ipfs key import vanity-1 $HASH
@@ -226,7 +226,7 @@ Now you have a key called `vanity-1` that produces a `/ipns/$HASH` that you like
 
 To view your IPNS hash again:
 
-```{bash}
+```bash
 ipfs key list -l --ipns-base b58mh
 ```
 
@@ -239,7 +239,7 @@ If you want to brute-force even faster, or if you have only 1 CPU, install their
 
 Create a new local git repo for the site.
 
-```{bash}
+```bash
 git init --initial-branch=main
 git add .
 git commit -m "Initial commit"
@@ -247,7 +247,7 @@ git commit -m "Initial commit"
 
 Create a remote git repo (e.g. on github) and update your git remote to reference the new repo.
 
-```{bash}
+```bash
 git remote add origin git@github.com:0xidm/new-website
 git push -u origin main
 ```

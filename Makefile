@@ -28,4 +28,3 @@ open:
 
 build-readme:
 	./bin/build-pandoc.sh default Readme.md
-	IPFS_API=$(IPFS_API) ./bin/add-ipfs.sh -k $(IPFS_KEY) -f _site/index.html
