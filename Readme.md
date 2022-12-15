@@ -13,7 +13,7 @@ Using this method, a website built with relative URLs will function the same on 
 git clone https://github.com/0xidm/mutable-ipfs-website new-website
 cd new-website
 cp settings.example.mk settings.mk
-# if your IPFS node is not localhost, edit settings.mk to change IPFS_API
+# change IPFS_API in settings.mk if IPFS not on localhost
 make key build publish
 ```
 
@@ -120,7 +120,7 @@ which expands into the following:
 
 These commands can be invoked manually.
 
-### Publish other files and link from `index.md`
+### Publish any other files
 
 Add any file to IPFS, then publish to the IPNS hash from the `website-1` key.
 
@@ -133,10 +133,54 @@ This file is now available from a stable URL:
 
 https://ipfs.io/ipns/$HASH/hello.txt
 
-The file can be referenced from `index.md` using a relative path.
-Specify URL in markdown as `[a link to the text file](hello.txt)`
-
 The file can be updated by re-running `add-ipfs.sh` and the URL will remain stable, even though the file content has changed.
+
+#### Link any file from `index.md`
+
+A file can be referenced from `index.md` using a relative path.
+In the `hello.txt` example, specify URL in markdown as `[a link to the text file](hello.txt)`
+
+#### Subdirectories
+
+A file can be placed in an MFS subdirectory.
+In the following example, `hello.txt` is placed into the `documents` subdirectory:
+
+```{bash}
+echo "Hello IPFS" > hello.txt
+./bin/add-ipfs.sh -k website-1 -d documents -f hello.txt
+```
+
+The file is now available inside the `documents` subdirectory:
+
+https://ipfs.io/ipns/$HASH/documents/hello.txt
+
+Currently just 1-level of subdirectory nesting is supported.
+For more complex trees, consider the IPFS Web UI.
+
+### IPFS Web UI
+
+The IPFS web UI is an easy way to manage files for a website.
+Using the Files interface, navigate to `/public/$YOUR_KEY` to see the website files.
+
+#### Force IPNS Refresh
+
+Any time files are changed, IPNS must be updated.
+Although `add-ipfs.sh` generally updates IPNS automatically, sometimes IPNS must be manually refreshed.
+When the IPFS Web UI changes files - or *any* process other than `add-ipfs.sh` - it's necessary to refresh IPNS.
+
+The following will refresh IPNS for the configured key:
+
+```{bash}
+make refresh-ipns
+```
+
+which expands into:
+
+```{bash}
+IPFS_API=$(IPFS_API) ./bin/add-ipfs.sh -k $(IPFS_KEY)
+```
+
+Since no filename is provided to `add-ipfs.sh`, this command only updates IPNS.
 
 ## Pandoc
 

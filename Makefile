@@ -17,6 +17,9 @@ build:
 publish:
 	IPFS_API=$(IPFS_API) ./bin/add-ipfs.sh -k $(IPFS_KEY) -f _site/index.html
 
+refresh-ipns:
+	IPFS_API=$(IPFS_API) ./bin/add-ipfs.sh -k $(IPFS_KEY)
+
 key:
 	ipfs --api=$(IPFS_API) key gen $(IPFS_KEY)
 
@@ -25,4 +28,4 @@ open:
 
 build-readme:
 	./bin/build-pandoc.sh default Readme.md
-	IPFS_API=$(IPFS_API) ./bin/add-ipfs.sh -k oxidm-1 -f _site/index.html
+	IPFS_API=$(IPFS_API) ./bin/add-ipfs.sh -k $(IPFS_KEY) -f _site/index.html
