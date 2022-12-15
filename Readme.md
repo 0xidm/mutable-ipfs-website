@@ -5,7 +5,7 @@ In more technical terms: create a mutable IPFS website with a stable IPNS hash.
 Using this method, a website built with relative URLs will function the same on IPFS as on the classic web.
 
 - [github project](https://github.com/0xidm/mutable-ipfs-website)
-- [this readme on ipfs](https://ipfs.io/ipns/12D3KooWF3i8N37HMLfAzqBkcnuG9LQta5DNt58VqZYNJhRoXiDM)
+- [view on ipfs](https://ipfs.io/ipns/12D3KooWPEU9jjJKHWdTJwZgr3xAegKdQEspikURgJ21cmooxidm)
 
 ## Quick Start
 
