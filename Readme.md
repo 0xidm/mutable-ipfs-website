@@ -164,9 +164,8 @@ Using the Files interface, navigate to `/public/$YOUR_KEY` to see the website fi
 
 #### Force IPNS Refresh
 
-Any time files are changed, IPNS must be updated.
-Although `add-ipfs.sh` generally updates IPNS automatically, sometimes IPNS must be manually refreshed.
-When the IPFS Web UI changes files - or *any* process other than `add-ipfs.sh` - it's necessary to refresh IPNS.
+Any time files are changed, including when the IPFS Web UI changes files, IPNS must be updated.
+Sometimes IPNS must be manually refreshed.
 
 The following will refresh IPNS for the configured key:
 
@@ -177,10 +176,10 @@ make refresh-ipns
 which expands into:
 
 ```bash
-IPFS_API=$(IPFS_API) ./bin/add-ipfs.sh -k $(IPFS_KEY)
+./bin/add-ipfs.sh -k website-1 -p
 ```
 
-Since no filename is provided to `add-ipfs.sh`, this command only updates IPNS.
+The `-p` option for `add-ipfs.sh` causes IPNS to be published (updated).
 
 ## Pandoc
 
@@ -230,7 +229,7 @@ To view your IPNS hash again:
 ipfs key list -l --ipns-base b58mh
 ```
 
-### 0xidm fork
+### 0xidm fork of `peer-id-generator`
 
 The 0xidm fork modifies the original code by [meehow](https://github.com/meehow/peer-id-generator) to reserve 1 CPU for system usability.
 If you want to brute-force even faster, or if you have only 1 CPU, install their code: `go install github.com/meehow/peer-id-generator`.
