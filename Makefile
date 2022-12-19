@@ -12,10 +12,16 @@ clean:
 	@rm -rf _site _build
 
 build:
+	@echo "build start"
 	@./bin/build-pandoc.sh $(STYLE)
+	@echo "build finished"
+	@echo
 
 publish:
+	@echo "publish start"
 	@IPFS_API=$(IPFS_API) ./bin/add-ipfs.sh -k $(IPFS_KEY) -f _site/index.html -p
+	@echo "publish finished"
+	@echo
 
 refresh-ipns:
 	@IPFS_API=$(IPFS_API) ./bin/add-ipfs.sh -k $(IPFS_KEY) -p
