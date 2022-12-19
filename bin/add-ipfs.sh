@@ -20,15 +20,12 @@ function ipfs_file_exists() {
 
 function ipfs_add_file() {
   local FILENAME; FILENAME=$1
-  echo -n "IPFS: add /ipfs/"
-  ipfs --api="$IPFS_API" add -q --cid-version=1 "$FILENAME"
+  ipfs --api="$IPFS_API" add -q --cid-version=1 "$FILENAME" 1>/dev/null
 }
 
 function ipfs_pin_file() {
   local FILENAME; FILENAME=$1
-  echo -n "IPFS: pin "
   ipfs --api="$IPFS_API" pin add $(get_ipfs_cid "$FILENAME") 1>/dev/null
-  echo OK
 }
 
 ###
@@ -58,10 +55,8 @@ function mfs_exists() {
 function mfs_copy_cid() {
   local IPFS_CID; IPFS_CID=$1
   local MFS_FILENAME; MFS_FILENAME=$2
-  mfs_unlink "$MFS_FILENAME"
-  echo -n "MFS: copy $IPFS_CID to $MFS_FILENAME "
+  mfs_unlink "$MFS_FILENAME"  
   ipfs --api="$IPFS_API" files cp "/ipfs/$IPFS_CID" "$MFS_FILENAME"
-  echo OK
 }
 
 function mfs_copy_file() {
@@ -73,18 +68,14 @@ function mfs_copy_file() {
 function mfs_mkdir() {
   local MFS_PATH; MFS_PATH=$1
   if [ -z "$(mfs_exists $MFS_PATH)" ]; then
-    echo -n "MFS: create path $MFS_PATH "
     ipfs --api="$IPFS_API" files mkdir "$MFS_PATH"
-    echo OK
   fi
 }
 
 function mfs_unlink() {
   local MFS_PATH; MFS_PATH=$1
   if [ ! -z $(mfs_exists $MFS_PATH) ]; then
-    echo -n "MFS: remove link $MFS_PATH "
     ipfs --api="$IPFS_API" files rm "$MFS_PATH"
-    echo OK
   fi
 }
 
@@ -98,9 +89,7 @@ function mfs_link_cid() {
   local IPFS_CID; IPFS_CID=$1
   local MFS_PATH; MFS_PATH=$2
   if [ -z "$(get_mfs_hash $MFS_PATH)" ]; then
-    echo "MFS: create link $MFS_PATH"
     ipfs --api="$IPFS_API" files cp "/ipfs/$IPFS_CID" "$MFS_PATH"
-    echo OK
   fi
 }
 
@@ -118,9 +107,8 @@ function mfs_create_path() {
 
 function ipns_publish() {
   local IPFS_KEY; IPFS_KEY=$1
-  echo -n "IPNS: publish /ipns/"
   ipfs --api="$IPFS_API" name publish --quieter --key="$IPFS_KEY" \
-    $(get_mfs_hash "/public/$IPFS_KEY")
+    $(get_mfs_hash "/public/$IPFS_KEY") 1>/dev/null
 }
 
 function get_ipns_filename() {
@@ -158,60 +146,78 @@ function usage() {
   echo "  -p: publish to ipns"
 }
 
-function process_cmdline() {
+function run_with_args() {
+  local IPFS_KEY
+  local MFS_SUBDIR
+  local FILENAME
+  local PUBLISH
+
   if [ -z "$IPFS_API" ]; then
     echo "IPFS_API environment variable not set"
     echo "Example: IPFS_API=/ip4/127.0.0.1/tcp/5001"
     exit 1
   fi
 
-  # these variables are global; only use within main()
   while getopts 'pk:f:d:' flag; do
     case "${flag}" in
-      p) _PUBLISH="1" ;;
-      d) _MFS_SUBDIR="${OPTARG}" ;;
-      k) _IPFS_KEY="${OPTARG}" ;;
-      f) _FILENAME="${OPTARG}" ;;
+      p) PUBLISH="1" ;;
+      d) MFS_SUBDIR="${OPTARG}" ;;
+      k) IPFS_KEY="${OPTARG}" ;;
+      f) FILENAME="${OPTARG}" ;;
       *) usage; exit 1 ;;
     esac
   done
   shift "$((OPTIND -1))"
 
-  if [ -z "$_IPFS_KEY" ]; then
+  if [ -z "$IPFS_KEY" ]; then
     echo "no key provided"
     usage
     exit 1
   fi
+
+  # all local variables are visible within main
+  main
 }
 
 function main() {
-  if [ -z "$(key_exists $_IPFS_KEY)" ]; then
-    echo "key not found: $_IPFS_KEY"
+  if [ -z "$(key_exists $IPFS_KEY)" ]; then
+    echo "key not found: $IPFS_KEY"
     exit 1
   fi
 
-  if [ -f "$_FILENAME" ]; then
-    local MFS_FILENAME; MFS_FILENAME=$(get_mfs_filename "$_IPFS_KEY" "$_MFS_SUBDIR" "$_FILENAME")
+  if [ -f "$FILENAME" ]; then
+    local MFS_FILENAME; MFS_FILENAME=$(get_mfs_filename "$IPFS_KEY" "$MFS_SUBDIR" "$FILENAME")
 
-    if [ -z $(ipfs_file_exists "$_FILENAME") ]; then
-      ipfs_add_file "$_FILENAME"
-      ipfs_pin_file "$_FILENAME"
-      mfs_create_path "$_IPFS_KEY" "$_MFS_SUBDIR"
-      mfs_copy_file "$_FILENAME" "$MFS_FILENAME"
-      if [ ! -z "$_PUBLISH" ]; then ipns_publish "$_IPFS_KEY"; fi
+    if [ -z $(ipfs_file_exists "$FILENAME") ]; then
+      echo -n "IPFS: add $FILENAME "
+      ipfs_add_file "$FILENAME"
+      ipfs_pin_file "$FILENAME"
+      echo OK
+
+      echo -n "MFS: copy to $MFS_FILENAME "
+      mfs_create_path "$IPFS_KEY" "$MFS_SUBDIR"
+      mfs_copy_file "$FILENAME" "$MFS_FILENAME"
+      echo OK
+
+      if [ ! -z "$PUBLISH" ]; then 
+        echo -n "IPNS: publish "
+        ipns_publish "$IPFS_KEY"
+        echo OK
+      fi
     else
-      mfs_link_file "$_FILENAME" "$MFS_FILENAME"
+      mfs_link_file "$FILENAME" "$MFS_FILENAME"
     fi
 
-    echo $(get_ipns_filename "$_IPFS_KEY" "$MFS_FILENAME")
+    echo $(get_ipns_filename "$IPFS_KEY" "$MFS_FILENAME")
   else
-    if [ ! -z "$_PUBLISH" ]; then 
-      ipns_publish "$_IPFS_KEY"
+    if [ ! -z "$PUBLISH" ]; then 
+      echo -n "IPNS: publish "
+      ipns_publish "$IPFS_KEY"
+      echo OK
     else
-      echo "file not found: $_FILENAME"
+      echo "file not found: $FILENAME"
     fi    
   fi
 }
 
-process_cmdline "$@"
-main
+run_with_args "$@"
