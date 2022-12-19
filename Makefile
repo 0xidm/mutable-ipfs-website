@@ -15,10 +15,10 @@ build:
 	./bin/build-pandoc.sh $(STYLE)
 
 publish:
-	IPFS_API=$(IPFS_API) ./bin/add-ipfs.sh -k $(IPFS_KEY) -f _site/index.html
+	IPFS_API=$(IPFS_API) ./bin/add-ipfs.sh -k $(IPFS_KEY) -f _site/index.html -p
 
 refresh-ipns:
-	IPFS_API=$(IPFS_API) ./bin/add-ipfs.sh -k $(IPFS_KEY)
+	IPFS_API=$(IPFS_API) ./bin/add-ipfs.sh -k $(IPFS_KEY) -p
 
 key:
 	ipfs --api=$(IPFS_API) key gen $(IPFS_KEY)
